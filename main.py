@@ -10,13 +10,16 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+import os
 
-DB_HOST = "localhost"
-DB_PORT = 3306
-DB_USER = "root"
-DB_PASSWORD = "MySQLBest1!"
-DB_NAME = "teachers_db"
+# Берем параметры подключения из переменных окружения, которые предоставляет Railway
+DB_HOST = os.getenv("MYSQLHOST", "localhost")          # Адрес хоста
+DB_PORT = int(os.getenv("MYSQLPORT", "3306"))          # Порт
+DB_USER = os.getenv("MYSQLUSER", "root")               # Пользователь
+DB_PASSWORD = os.getenv("MYSQLPASSWORD", "")           # Пароль
+DB_NAME = os.getenv("MYSQLDATABASE", "teachers_db")    # Имя базы данных
 
+# Формируем строку подключения
 DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 try:
