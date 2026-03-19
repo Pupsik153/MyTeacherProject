@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" href="image/favicon.png" type="image/png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>МойУчитель</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Верхняя плашка */
+        .header {
+            background: #1a237e;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 3px solid #0d47a1;
+            margin: 0;
+            border-radius: 0;
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            flex: 1;
+            margin: 0;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .user-icon {
+            width: 40px;
+            height: 40px;
+            background: #5c6bc0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .app {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Заголовок с именем учителя */
+        .teacher-header {
+            background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+            color: white;
+            padding: 30px;
+        }
+
+        .teacher-header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .teacher-meta {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .teacher-subject {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .reviews-count {
+            font-size: 1.1rem;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        /* Сводка рейтингов */
+        .ratings-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #1a237e;
+        }
+
+        .summary-stars {
+            color: #ffc107;
+            font-size: 1rem;
+        }
+
+        /* Список отзывов */
+        .reviews-list {
+            padding: 30px;
+        }
+
+        .review-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: box-shadow 0.3s;
+        }
+
+        .review-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .review-author {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a237e;
+        }
+
+        .review-date {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .review-ratings {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .rating-item {
+            text-align: center;
+        }
+
+        .rating-item .label {
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .rating-item .stars {
+            color: #ffc107;
+            font-size: 1rem;
+            letter-spacing: 2px;
+        }
+
+        .rating-item .value {
+            font-weight: 600;
+            color: #1a237e;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+
+        .review-comment {
+            line-height: 1.6;
+            color: #333;
+            font-size: 1rem;
+            padding: 10px 0;
+        }
+
+        /* Кнопки действий */
+        .action-buttons {
+            padding: 20px 30px 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #1a237e;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0d1b5e;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 2px solid #1a237e;
+            color: #1a237e;
+        }
+
+        .btn-outline:hover {
+            background: #e8eaf6;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #d32f2f;
+        }
+
+        .no-reviews {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .ratings-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .review-ratings {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .review-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <a href="javascript:history.back()" class="back-btn">← Назад</a>
+            <h1>МойУчитель</h1>
+            <div class="user-icon">А</div>
+        </div>
+    </div>
+
+    <div class="app" id="reviewsApp">
+        <div class="loading">Загрузка отзывов...</div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const teacherId = urlParams.get('id');
+
+        async function loadTeacherAndReviews() {
+            try {
+                // Загружаем информацию об учителе
+                const teacherResponse = await fetch(`http://localhost:8000/teachers/${teacherId}`);
+                if (!teacherResponse.ok) throw new Error('Учитель не найден');
+                const teacher = await teacherResponse.json();
+
+                // Загружаем отзывы
+                const reviewsResponse = await fetch(`http://localhost:8000/teachers/${teacherId}/reviews`);
+                const reviews = await reviewsResponse.json();
+
+                renderPage(teacher, reviews);
+
+            } catch (error) {
+                console.error('Ошибка:', error);
+                document.getElementById('reviewsApp').innerHTML = `
+                    <div class="error">
+                        ❌ Ошибка загрузки данных<br>
+                        <a href="index.html" style="color: #1a237e; margin-top: 20px; display: inline-block;">Вернуться к списку</a>
+                    </div>
+                `;
+            }
+        }
+
+        function calculateAverages(reviews) {
+            if (reviews.length === 0) {
+                return {
+                    overall: 0,
+                    fairness: 0,
+                    attitude: 0,
+                    clarity: 0
+                };
+            }
+
+            const fairness = reviews.reduce((sum, r) => sum + r.fairness_rating, 0) / reviews.length;
+            const attitude = reviews.reduce((sum, r) => sum + r.attitude_rating, 0) / reviews.length;
+            const clarity = reviews.reduce((sum, r) => sum + r.clarity_rating, 0) / reviews.length;
+            const overall = (fairness + attitude + clarity) / 3;
+
+            return {
+                overall: overall.toFixed(1),
+                fairness: fairness.toFixed(1),
+                attitude: attitude.toFixed(1),
+                clarity: clarity.toFixed(1)
+            };
+        }
+
+        function renderStars(rating) {
+            const fullStars = Math.round(rating);
+            return '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ru-RU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        function renderPage(teacher, reviews) {
+            const averages = calculateAverages(reviews);
+
+            // Получаем предметы
+            let subjects = [];
+            if (teacher.subjects) {
+                subjects = teacher.subjects.map(s => s.name);
+            } else if (teacher.subject_name) {
+                subjects = [teacher.subject_name];
+            }
+
+            const pageHtml = `
+                <div class="teacher-header">
+                    <h1>${teacher.name}</h1>
+                    <div class="teacher-meta">
+                        <span class="teacher-subject">${subjects.join(', ') || 'Предмет не указан'}</span>
+                        <span class="reviews-count"> Отзывы ${reviews.length}</span>
+                    </div>
+                </div>
+
+                ${reviews.length > 0 ? `
+                    <div class="ratings-summary">
+                        <div class="summary-item">
+                            <div class="summary-label">Общая оценка</div>
+                            <div class="summary-value">${averages.overall}</div>
+                            <div class="summary-stars">${renderStars(averages.overall)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Объективность</div>
+                            <div class="summary-value">${averages.fairness}</div>
+                            <div class="summary-stars">${renderStars(averages.fairness)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Отзывчивость</div>
+                            <div class="summary-value">${averages.attitude}</div>
+                            <div class="summary-stars">${renderStars(averages.attitude)}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Понятность</div>
+                            <div class="summary-value">${averages.clarity}</div>
+                            <div class="summary-stars">${renderStars(averages.clarity)}</div>
+                        </div>
+                    </div>
+                ` : ''}
+
+                <div class="reviews-list">
+                    ${reviews.length === 0 ? `
+                        <div class="no-reviews">
+                             Пока нет отзывов об этом учителе<br>
+                            <a href="add-review.html?id=${teacher.id}" style="color: #1a237e; margin-top: 20px; display: inline-block;">Написать первый отзыв</a>
+                        </div>
+                    ` : reviews.map(review => `
+                        <div class="review-card">
+                            <div class="review-header">
+                                <span class="review-author"> ${review.author_name}</span>
+                                <span class="review-date">${formatDate(review.created_at) || ''}</span>
+                            </div>
+
+                            <div class="review-ratings">
+                                <div class="rating-item">
+                                    <div class="label">Общая</div>
+                                    <div class="stars">${renderStars((review.fairness_rating + review.attitude_rating + review.clarity_rating) / 3)}</div>
+                                    <div class="value">${((review.fairness_rating + review.attitude_rating + review.clarity_rating) / 3).toFixed(1)}</div>
+                                </div>
+                                <div class="rating-item">
+                                    <div class="label">Объективность</div>
+                                    <div class="stars">${renderStars(review.fairness_rating)}</div>
+                                    <div class="value">${review.fairness_rating}</div>
+                                </div>
+                                <div class="rating-item">
+                                    <div class="label">Отзывчивость</div>
+                                    <div class="stars">${renderStars(review.attitude_rating)}</div>
+                                    <div class="value">${review.attitude_rating}</div>
+                                </div>
+                                <div class="rating-item">
+                                    <div class="label">Понятность</div>
+                                    <div class="stars">${renderStars(review.clarity_rating)}</div>
+                                    <div class="value">${review.clarity_rating}</div>
+                                </div>
+                            </div>
+
+                            <div class="review-comment">
+                                ${review.comment}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="action-buttons">
+                    <a href="teacher.html?id=${teacher.id}" class="btn btn-outline"> Профиль учителя</a>
+                    <a href="add-review.html?id=${teacher.id}" class="btn btn-primary">Написать отзыв</a>
+                    <a href="index.html" class="btn btn-outline"> На главную</a>
+                </div>
+            `;
+
+            document.getElementById('reviewsApp').innerHTML = pageHtml;
+        }
+
+        // Загружаем данные при открытии страницы
+        if (teacherId) {
+            loadTeacherAndReviews();
+        } else {
+            document.getElementById('reviewsApp').innerHTML = `
+                <div class="error">
+                    ❌ ID учителя не указан<br>
+                    <a href="index.html" style="color: #1a237e; margin-top: 20px; display: inline-block;">Вернуться к списку</a>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

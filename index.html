@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" href="image/favicon.png" type="image/png">
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>МойУчитель</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+        background-color: #f0f2f5;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Верхняя плашка на всю ширину экрана */
+    .header {
+        background: #1a237e;
+        color: white;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        border-bottom: 3px solid #0d47a1;
+        margin: 0;
+        border-radius: 0;
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+    }
+
+    .header-content {
+        max-width: 1400px;
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .header h1 {
+        font-size: 1.2rem;
+        font-weight: 500;
+        flex: 1;
+        margin: 0;
+    }
+
+    .menu-icon {
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    .user-icon {
+        width: 40px;
+        height: 40px;
+        background: #5c6bc0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    .app {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: white;
+        min-height: 100vh;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    .content {
+        display: flex;
+        padding: 20px;
+        gap: 24px;
+        flex-direction: row;
+    }
+
+    /* Боковая панель фильтров - справа */
+    .sidebar {
+        width: 280px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        order: 2;
+    }
+
+    .filter-header {
+        padding: 16px;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #1a237e;
+        font-weight: 500;
+    }
+
+    .filter-header svg {
+        fill: #1a237e;
+    }
+
+    .search-box {
+        padding: 16px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+        background: #fafafa;
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: #1a237e;
+        background: white;
+    }
+
+    .filter-section {
+        padding: 16px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .filter-title {
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+
+    .subject-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .subject-item {
+        display: flex;
+        align-items: center;
+        padding: 6px 0;
+        font-size: 14px;
+        color: #444;
+        cursor: pointer;
+    }
+
+    .subject-item:hover {
+        background: #f5f5f5;
+    }
+
+    .subject-item input[type="checkbox"] {
+        margin-right: 10px;
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+
+    .subject-count {
+        margin-left: auto;
+        color: #888;
+        font-size: 13px;
+    }
+
+    .filter-actions {
+        padding: 16px;
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        font-size: 13px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        background: #1a237e;
+        color: white;
+        flex: 1;
+    }
+
+    .btn-primary:hover {
+        background: #0d1b5e;
+    }
+
+    .btn-outline {
+        background: white;
+        border: 1px solid #1a237e;
+        color: #1a237e;
+    }
+
+    .btn-outline:hover {
+        background: #e8eaf6;
+    }
+
+    .stats {
+        padding: 16px;
+        background: #fafafa;
+        border-top: 1px solid #e0e0e0;
+        font-size: 13px;
+        color: #666;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .stats span span {
+        font-weight: 600;
+        color: #1a237e;
+    }
+
+    /* Основная таблица - слева */
+    .main-panel {
+        flex: 1;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        overflow: hidden;
+        order: 1;
+    }
+
+    .table-header {
+        padding: 16px;
+        background: #fafafa;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .table-header h2 {
+        font-size: 16px;
+        font-weight: 500;
+        color: #1a237e;
+    }
+
+    .refresh-btn {
+        background: none;
+        border: 1px solid #1a237e;
+        color: #1a237e;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+
+    .refresh-btn:hover {
+        background: #e8eaf6;
+    }
+
+    /* Контейнер таблицы с прокруткой */
+    .table-container {
+        overflow-x: auto;
+        margin: 0 -1px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        table-layout: auto;
+    }
+
+    th {
+        background: #f5f5f5;
+        padding: 8px 6px;
+        text-align: left;
+        font-weight: 500;
+        color: #333;
+        border-bottom: 2px solid #e0e0e0;
+        white-space: nowrap;
+    }
+
+    td {
+        padding: 8px 6px;
+        border-bottom: 1px solid #e0e0e0;
+        color: #444;
+        white-space: nowrap;
+    }
+
+    tr:hover td {
+        background: #fafafa;
+    }
+
+    /* Фиксированная ширина колонок */
+    th:nth-child(1), td:nth-child(1) { width: 40px; }  /* Фото */
+    th:nth-child(2), td:nth-child(2) { max-width: 180px; } /* Имя */
+    th:nth-child(3), td:nth-child(3) { max-width: 100px; } /* Предмет */
+    th:nth-child(4), td:nth-child(4) { width: 60px; }  /* Общая оценка */
+    th:nth-child(5), td:nth-child(5) { width: 60px; }  /* Объективность */
+    th:nth-child(6), td:nth-child(6) { width: 60px; }  /* Отзывчивость */
+    th:nth-child(7), td:nth-child(7) { width: 60px; }  /* Понятность */
+
+    /* Фото учителя - компактное */
+    .teacher-photo {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #5c6bc0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 11px;
+        margin: 0 auto;
+    }
+
+    /* Ссылка на учителя */
+    .teacher-link {
+        color: #1a237e;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 13px;
+        display: inline-block;
+        max-width: 160px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .teacher-link:hover {
+        text-decoration: underline;
+    }
+
+    /* Теги предметов - компактные */
+    .subject-tag {
+        display: inline-block;
+        background: #e8eaf6;
+        color: #1a237e;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 12px;
+        margin: 1px;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    /* Оценки */
+    .rating {
+        font-weight: 600;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .rating-high {
+        color: #2e7d32;
+    }
+
+    .rating-medium {
+        color: #ed6c02;
+    }
+
+    .rating-low {
+        color: #d32f2f;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+    }
+
+    .error {
+        text-align: center;
+        padding: 40px;
+        color: #d32f2f;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+    }
+
+    @media (max-width: 1024px) {
+        .content {
+            flex-direction: column;
+        }
+        .sidebar {
+            width: 100%;
+        }
+        /* Отключаем фиксированную ширину на мобильных */
+        th:nth-child(n), td:nth-child(n) {
+            width: auto;
+            max-width: none;
+        }
+    }
+</style>
+</head>
+<body>
+
+    <div class="header">
+    <div class="header-content">
+        <h1>МойУчитель</h1>
+        <div class="user-icon">А</div>
+    </div>
+</div>
+
+        <div class="content">
+            <div class="sidebar">
+                <div class="filter-header">Фильтры</div>
+
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Поиск по имени...">
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">Предметы</div>
+                    <div class="subject-list" id="subjectList">
+                        <div class="loading">Загрузка предметов...</div>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn btn-primary" onclick="applyFilters()">Применить</button>
+                    <button class="btn btn-outline" onclick="resetFilters()">Сбросить</button>
+                </div>
+
+                <div class="stats" id="stats">
+                    <span>Всего: <span id="totalCount">0</span></span>
+                    <span>Показано: <span id="displayedCount">0</span></span>
+                </div>
+            </div>
+
+            <div class="main-panel">
+                <div class="table-header">
+                    <h2>Список учителей</h2>
+                    <button class="refresh-btn" onclick="loadTeachers()">↻ Обновить</button>
+                </div>
+
+                <div class="table-container">
+                    <table id="teachersTable">
+                        <thead>
+                            <tr>
+                                <th>Фото</th>
+                                <th>Имя учителя</th>
+                                <th>Предмет</th>
+                                <th>Общая оценка</th>
+                                <th>Объективность</th>
+                                <th>Отзывчивость</th>
+                                <th>Понятность</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr>
+                                <td colspan="7" class="loading">Загрузка данных...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allTeachers = [];
+        let filteredTeachers = [];
+        let allSubjects = [];
+        let selectedSubjects = new Set();
+        let searchTerm = '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Страница загружена, начинаем загрузку учителей...');
+            loadTeachers();
+        });
+
+        async function loadTeachers() {
+            console.log('Загрузка учителей...');
+
+            try {
+                const response = await fetch('http://localhost:8000/teachers');
+                console.log('Ответ получен, статус:', response.status);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ошибка! статус: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Получены данные:', data);
+
+                if (Array.isArray(data)) {
+                    allTeachers = data;
+                } else {
+                    console.error('Неожиданный формат данных:', data);
+                    allTeachers = [];
+                }
+
+                filteredTeachers = [...allTeachers];
+                extractSubjects();
+                renderTable();
+                updateStats();
+
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+                document.getElementById('tableBody').innerHTML = `
+                    <tr>
+                        <td colspan="7" class="error">
+                            ❌ Ошибка загрузки: ${error.message}<br>
+                            <button class="refresh-btn" onclick="loadTeachers()" style="margin-top: 10px;">Повторить</button>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function extractSubjects() {
+            console.log('Извлечение предметов из данных...');
+            const subjectsSet = new Set();
+
+            allTeachers.forEach(teacher => {
+                if (teacher.subject_name) {
+                    subjectsSet.add(teacher.subject_name);
+                }
+            });
+
+            allSubjects = Array.from(subjectsSet).sort();
+            console.log('Найдены предметы:', allSubjects);
+            renderSubjectFilters();
+        }
+
+        function renderSubjectFilters() {
+            const container = document.getElementById('subjectList');
+
+            if (allSubjects.length === 0) {
+                container.innerHTML = '<div class="no-data">Нет предметов</div>';
+                return;
+            }
+
+            container.innerHTML = allSubjects.map(subject => {
+                const count = allTeachers.filter(t => t.subject_name === subject).length;
+                return `
+                    <div class="subject-item" onclick="toggleSubject('${subject}')">
+                        <input type="checkbox"
+                               ${selectedSubjects.has(subject) ? 'checked' : ''}
+                               onchange="toggleSubject('${subject}')"
+                               onclick="event.stopPropagation()">
+                        <span>${subject}</span>
+                        <span class="subject-count">${count}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleSubject(subject) {
+            if (selectedSubjects.has(subject)) {
+                selectedSubjects.delete(subject);
+            } else {
+                selectedSubjects.add(subject);
+            }
+            renderSubjectFilters();
+            applyFilters();
+        }
+
+        function applyFilters() {
+            searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            filteredTeachers = allTeachers.filter(teacher => {
+                const nameMatch = teacher.name.toLowerCase().includes(searchTerm);
+                let subjectMatch = true;
+                if (selectedSubjects.size > 0) {
+                    subjectMatch = selectedSubjects.has(teacher.subject_name);
+                }
+
+                return nameMatch && subjectMatch;
+            });
+
+            renderTable();
+            updateStats();
+        }
+
+        function resetFilters() {
+            selectedSubjects.clear();
+            searchTerm = '';
+            document.getElementById('searchInput').value = '';
+            renderSubjectFilters();
+            filteredTeachers = [...allTeachers];
+            renderTable();
+            updateStats();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+
+            if (filteredTeachers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="no-data">Нет данных</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filteredTeachers.map(teacher => {
+                let avgClarity = 0, avgFairness = 0, avgAttitude = 0, avgOverall = 0;
+
+                if (teacher.reviews && teacher.reviews.length > 0) {
+                    const reviews = teacher.reviews;
+                    avgClarity = reviews.reduce((sum, r) => sum + r.clarity_rating, 0) / reviews.length;
+                    avgFairness = reviews.reduce((sum, r) => sum + r.fairness_rating, 0) / reviews.length;
+                    avgAttitude = reviews.reduce((sum, r) => sum + r.attitude_rating, 0) / reviews.length;
+                    avgOverall = (avgClarity + avgFairness + avgAttitude) / 3;
+                }
+                const initials = teacher.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+
+                return `
+                    <tr>
+                        <td><div class="teacher-photo">${initials}</div></td>
+                        <td><a href="teacher.html?id=${teacher.id}" class="teacher-link">${teacher.name}</a></td>
+                        <td><span class="subject-tag">${teacher.subject_name || '—'}</span></td>
+                        <td class="rating ${getRatingClass(avgOverall)}">${avgOverall.toFixed(2)}</td>
+                        <td class="rating ${getRatingClass(avgFairness)}">${avgFairness.toFixed(1)}</td>
+                        <td class="rating ${getRatingClass(avgAttitude)}">${avgAttitude.toFixed(1)}</td>
+                        <td class="rating ${getRatingClass(avgClarity)}">${avgClarity.toFixed(1)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getRatingClass(rating) {
+            if (rating >= 4.5) return 'rating-high';
+            if (rating >= 3.5) return 'rating-medium';
+            return 'rating-low';
+        }
+
+        function updateStats() {
+            document.getElementById('totalCount').textContent = allTeachers.length;
+            document.getElementById('displayedCount').textContent = filteredTeachers.length;
+        }
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            applyFilters();
+        });
+    </script>
+</body>
+</html>

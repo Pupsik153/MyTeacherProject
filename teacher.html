@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" href="image/favicon.png" type="image/png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>МойУчитель</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background: #1a237e;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 3px solid #0d47a1;
+            margin: 0;
+            border-radius: 0;
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            flex: 1;
+            margin: 0;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .user-icon {
+            width: 40px;
+            height: 40px;
+            background: #5c6bc0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .app {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+            color: white;
+            padding: 30px;
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .teacher-avatar {
+            width: 120px;
+            height: 120px;
+            background: #5c6bc0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            border: 4px solid rgba(255,255,255,0.3);
+        }
+
+        .teacher-title h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .teacher-subjects {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .subject-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            backdrop-filter: blur(5px);
+        }
+
+        .ratings-section {
+            padding: 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .ratings-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .rating-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .rating-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .rating-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1a237e;
+        }
+
+        .rating-stars {
+            color: #ffc107;
+            font-size: 1.2rem;
+            margin-top: 5px;
+        }
+
+        .info-section {
+            padding: 30px;
+            border-bottom: 1px solid #e0e0e0;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            gap: 15px;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: #666;
+            min-width: 120px;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .action-buttons {
+            padding: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #1a237e;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0d1b5e;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 2px solid #1a237e;
+            color: #1a237e;
+        }
+
+        .btn-outline:hover {
+            background: #e8eaf6;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #d32f2f;
+        }
+
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .ratings-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .info-section {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <a href="index.html" class="back-btn">← Назад к списку</a>
+            <h1>МойУчитель</h1>
+            <div class="user-icon">А</div>
+        </div>
+    </div>
+
+    <div class="app" id="teacherProfile">
+        <div class="loading">Загрузка данных...</div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const teacherId = urlParams.get('id');
+
+        async function loadTeacher() {
+            try {
+                const response = await fetch(`http://localhost:8000/teachers/${teacherId}`);
+                if (!response.ok) throw new Error('Учитель не найден');
+
+                const teacher = await response.json();
+
+                const reviewsResponse = await fetch(`http://localhost:8000/teachers/${teacherId}/reviews`);
+                const reviews = await reviewsResponse.json();
+
+                let avgRatings = {
+                    clarity: 0,
+                    fairness: 0,
+                    attitude: 0,
+                    overall: 0
+                };
+
+                if (reviews.length > 0) {
+                    avgRatings.clarity = reviews.reduce((sum, r) => sum + r.clarity_rating, 0) / reviews.length;
+                    avgRatings.fairness = reviews.reduce((sum, r) => sum + r.fairness_rating, 0) / reviews.length;
+                    avgRatings.attitude = reviews.reduce((sum, r) => sum + r.attitude_rating, 0) / reviews.length;
+                    avgRatings.overall = (avgRatings.clarity + avgRatings.fairness + avgRatings.attitude) / 3;
+                }
+
+                renderProfile(teacher, avgRatings, reviews.length);
+
+            } catch (error) {
+                console.error('Ошибка:', error);
+                document.getElementById('teacherProfile').innerHTML = `
+                    <div class="error">
+                        ❌ Ошибка загрузки профиля<br>
+                        <a href="index.html" style="color: #1a237e; margin-top: 20px; display: inline-block;">Вернуться к списку</a>
+                    </div>
+                `;
+            }
+        }
+
+        function renderProfile(teacher, ratings, reviewsCount) {
+            const initials = teacher.name.split(' ').map(n => n[0]).join('').toUpperCase();
+
+            let subjects = [];
+            if (teacher.subjects) {
+                subjects = teacher.subjects.map(s => s.name);
+            } else if (teacher.subject_name) {
+                subjects = [teacher.subject_name];
+            }
+
+            const experienceText = teacher.experience
+                ? `${teacher.experience} ${getYearsText(teacher.experience)}`
+                : '—';
+
+            const stars = (rating) => {
+                const fullStars = Math.round(rating);
+                return '⭐'.repeat(fullStars);
+            };
+
+            const profileHtml = `
+                <div class="profile-header">
+                    <div class="teacher-avatar">${initials}</div>
+                    <div class="teacher-title">
+                        <h1>${teacher.name}</h1>
+                        <div class="teacher-subjects">
+                            ${subjects.map(s => `<span class="subject-badge">${s}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ratings-section">
+                    <h2>Рейтинги учителя</h2>
+                    <div class="ratings-grid">
+                        <div class="rating-card">
+                            <div class="rating-label">Общая оценка</div>
+                            <div class="rating-value">${ratings.overall.toFixed(1)}</div>
+                            <div class="rating-stars">${stars(ratings.overall)}</div>
+                        </div>
+                        <div class="rating-card">
+                            <div class="rating-label">Объективность</div>
+                            <div class="rating-value">${ratings.fairness.toFixed(1)}</div>
+                            <div class="rating-stars">${stars(ratings.fairness)}</div>
+                        </div>
+                        <div class="rating-card">
+                            <div class="rating-label">Отзывчивость</div>
+                            <div class="rating-value">${ratings.attitude.toFixed(1)}</div>
+                            <div class="rating-stars">${stars(ratings.attitude)}</div>
+                        </div>
+                        <div class="rating-card">
+                            <div class="rating-label">Понятность</div>
+                            <div class="rating-value">${ratings.clarity.toFixed(1)}</div>
+                            <div class="rating-stars">${stars(ratings.clarity)}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-item">
+                        <span class="info-label">Преподает:</span>
+                        <span class="info-value">${subjects.join(', ') || '—'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Стаж:</span>
+                        <span class="info-value">${experienceText}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Образование:</span>
+                        <span class="info-value">${teacher.education || '—'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Всего отзывов:</span>
+                        <span class="info-value">${reviewsCount}</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="add-review.html?id=${teacher.id}" class="action-btn btn-primary"> Написать отзыв</a>
+                    <a href="reviews.html?id=${teacher.id}" class="action-btn btn-outline"> Все отзывы (${reviewsCount})</a>
+                </div>
+            `;
+
+            document.getElementById('teacherProfile').innerHTML = profileHtml;
+        }
+
+        function getYearsText(years) {
+            if (!years) return '';
+            const lastDigit = years % 10;
+            const lastTwoDigits = years % 100;
+
+            if (lastTwoDigits >= 11 && lastTwoDigits <= 19) return 'лет';
+            if (lastDigit === 1) return 'год';
+            if (lastDigit >= 2 && lastDigit <= 4) return 'года';
+            return 'лет';
+        }
+
+        if (teacherId) {
+            loadTeacher();
+        } else {
+            document.getElementById('teacherProfile').innerHTML = `
+                <div class="error">
+                    ❌ ID учителя не указан<br>
+                    <a href="index.html" style="color: #1a237e; margin-top: 20px; display: inline-block;">Вернуться к списку</a>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

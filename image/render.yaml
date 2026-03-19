@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: teachers-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DB_HOST
+        value: ваш-хост-mysql
+      - key: DB_USER
+        value: root
+      - key: DB_PASSWORD
+        value: MySQLBest1!
+      - key: DB_NAME
+        value: teachers_db
