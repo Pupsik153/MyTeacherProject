@@ -7,16 +7,16 @@ from sqlalchemy.exc import SQLAlchemyError
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Dict
 import logging
+import os
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-DB_HOST = "localhost"
-DB_PORT = 3306
-DB_USER = "root"
-DB_PASSWORD = "MySQLBest1!"
-DB_NAME = "teachers_db"
-
+DB_HOST = os.getenv("MYSQLHOST", "localhost")
+DB_PORT = int(os.getenv("MYSQLPORT", "3306"))
+DB_USER = os.getenv("MYSQLUSER", "root")
+DB_PASSWORD = os.getenv("MYSQLPASSWORD", "")
+DB_NAME = os.getenv("MYSQLDATABASE", "teachers_db")
 DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 try:
