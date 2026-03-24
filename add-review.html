@@ -506,70 +506,74 @@
             });
         }
 
-        async function submitReview() {
-            const authorName = document.getElementById('authorName').value.trim();
-            const reviewText = document.getElementById('reviewText').value.trim();
+async function submitReview() {
+    const authorName = document.getElementById('authorName').value.trim();
+    const reviewText = document.getElementById('reviewText').value.trim();
 
-            // Валидация
-            if (!authorName) {
-                alert('Пожалуйста, введите ваше имя');
-                return;
+    // Валидация
+    if (!authorName) {
+        alert('Пожалуйста, введите ваше имя');
+        return;
+    }
+
+    if (!reviewText) {
+        alert('Пожалуйста, напишите отзыв');
+        return;
+    }
+
+    if (ratings.fairness === 0 || ratings.attitude === 0 || ratings.clarity === 0) {
+        alert('Пожалуйста, поставьте оценки по всем критериям');
+        return;
+    }
+
+    // Формируем URL с параметрами
+    const url = new URL('http://localhost:8000/reviews');
+    url.searchParams.append('teacher_id', teacherId);
+    url.searchParams.append('author_name', authorName);
+    url.searchParams.append('clarity_rating', ratings.clarity);
+    url.searchParams.append('fairness_rating', ratings.fairness);
+    url.searchParams.append('attitude_rating', ratings.attitude);
+    url.searchParams.append('comment', reviewText);
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
             }
+        });
 
-            if (!reviewText) {
-                alert('Пожалуйста, напишите отзыв');
-                return;
-            }
-
-            if (ratings.fairness === 0 || ratings.attitude === 0 || ratings.clarity === 0) {
-                alert('Пожалуйста, поставьте оценки по всем критериям');
-                return;
-            }
-
-            try {
-                const response = await fetch('http://localhost:8000/reviews', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        teacher_id: parseInt(teacherId),
-                        author_name: authorName,
-                        clarity_rating: ratings.clarity,
-                        fairness_rating: ratings.fairness,
-                        attitude_rating: ratings.attitude,
-                        comment: reviewText
-                    })
-                });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.detail || 'Ошибка при отправке');
-                }
-
-                const result = await response.json();
-
-                // Показываем сообщение об успехе
-                document.getElementById('reviewApp').innerHTML = `
-                    <div class="success">
-                        <h2>✅ Отзыв успешно отправлен!</h2>
-                        <p>Спасибо за ваш отзыв об учителе.</p>
-                        <div style="margin-top: 20px;">
-                            <a href="teacher.html?id=${teacherId}" class="btn btn-primary" style="text-decoration: none;">Вернуться к профилю</a>
-                        </div>
-                    </div>
-                    <div class="navigation">
-                        <a href="teacher.html?id=${teacherId}" class="nav-link"> Профиль учителя</a>
-                        <a href="reviews.html?id=${teacherId}" class="nav-link"> Все отзывы</a>
-                        <a href="index.html" class="nav-link"> На главную</a>
-                    </div>
-                `;
-
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Ошибка при отправке отзыва: ' + error.message);
-            }
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Ошибка сервера:', errorData);
+            alert('Ошибка: ' + (errorData.detail || 'Неизвестная ошибка'));
+            return;
         }
+
+        const result = await response.json();
+        console.log('Отзыв отправлен:', result);
+
+        // Показываем сообщение об успехе
+        document.getElementById('reviewApp').innerHTML = `
+            <div class="success">
+                <h2>✅ Отзыв успешно отправлен!</h2>
+                <p>Спасибо за ваш отзыв об учителе.</p>
+                <div style="margin-top: 20px;">
+                    <a href="teacher.html?id=${teacherId}" class="btn btn-primary" style="text-decoration: none;">Вернуться к профилю</a>
+                </div>
+            </div>
+            <div class="navigation">
+                <a href="teacher.html?id=${teacherId}" class="nav-link">👤 Профиль учителя</a>
+                <a href="reviews.html?id=${teacherId}" class="nav-link">📋 Все отзывы</a>
+                <a href="index.html" class="nav-link">🏠 На главную</a>
+            </div>
+        `;
+
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Ошибка при отправке отзыва: ' + error.message);
+    }
+}
 
         // Загружаем данные при открытии страницы
         if (teacherId) {
