@@ -19,8 +19,6 @@
         margin: 0;
         padding: 0;
     }
-
-    /* Верхняя плашка на всю ширину экрана */
     .header {
         background: #1a237e;
         color: white;
@@ -319,18 +317,15 @@
         margin: 0 auto;
     }
 
-    /* Ссылка на учителя */
-    .teacher-link {
-        color: #1a237e;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 13px;
-        display: inline-block;
-        max-width: 160px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
+.teacher-link {
+    color: #1a237e;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 13px;
+    display: inline-block;
+    word-break: break-word;
+    white-space: normal;
+}
 
     .teacher-link:hover {
         text-decoration: underline;
@@ -415,7 +410,7 @@
                 <div class="filter-header">Фильтры</div>
 
                 <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="🔍 Поиск по имени...">
+                    <input type="text" id="searchInput" placeholder=" Поиск по имени...">
                 </div>
 
                 <div class="filter-section">
