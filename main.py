@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 import sqlite3
 import os
 from typing import List, Optional
+from fastapi.responses import HTMLResponse
 
 app = FastAPI(title="Teachers Reviews API", version="1.0.0")
 
@@ -74,10 +75,14 @@ init_db()
 
 # ==================== ЭНДПОИНТЫ ====================
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def root():
-    return {"message": "Teachers Reviews API", "docs": "/docs"}
-
+    """Главная страница"""
+    index_path = os.path.join(os.path.dirname(__file__), "index.html")
+    if os.path.exists(index_path):
+        with open(index_path, "r", encoding="utf-8") as f:
+            return f.read()
+    return HTMLResponse(content="<h1>Главная страница не найдена</h1>", status_code=404)
 
 @app.get("/health")
 def health():
