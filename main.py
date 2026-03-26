@@ -22,14 +22,12 @@ DB_PATH = os.path.join(os.path.dirname(__file__), "teachers.db")
 
 
 def get_db():
-    """Получить соединение с базой данных"""
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
 
 def init_db():
-    """Инициализация базы данных (создание таблиц)"""
     conn = get_db()
     cursor = conn.cursor()
 
@@ -68,7 +66,7 @@ def init_db():
 
     conn.commit()
     conn.close()
-    print("✅ База данных инициализирована")
+    print("База данных инициализирована")
 
 init_db()
 
@@ -77,7 +75,6 @@ init_db()
 
 @app.get("/", response_class=HTMLResponse)
 def root():
-    """Главная страница"""
     index_path = os.path.join(os.path.dirname(__file__), "index.html")
     if os.path.exists(index_path):
         with open(index_path, "r", encoding="utf-8") as f:
@@ -243,8 +240,7 @@ def delete_teacher(teacher_id: int):
     return {"message": f"Учитель '{teacher['name']}' удален"}
 
 
-# ==================== ОТЗЫВЫ ====================
-
+#ОТЗЫВЫ
 @app.get("/teachers/{teacher_id}/reviews")
 def get_teacher_reviews(teacher_id: int):
     conn = get_db()
@@ -261,8 +257,6 @@ def get_teacher_reviews(teacher_id: int):
     reviews = [dict(row) for row in cursor.fetchall()]
     conn.close()
     return reviews
-
-
 @app.post("/reviews")
 def create_review(
         teacher_id: int,
@@ -272,7 +266,6 @@ def create_review(
         attitude_rating: int,
         comment: str
 ):
-    # Валидация рейтингов
     if not all(1 <= r <= 5 for r in [clarity_rating, fairness_rating, attitude_rating]):
         raise HTTPException(status_code=400, detail="Оценки должны быть от 1 до 5")
 
@@ -327,6 +320,7 @@ def search_teachers(q: str):
     conn.close()
     return teachers
 app.mount("/", StaticFiles(directory=".", html=True), name="static")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
