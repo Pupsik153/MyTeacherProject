@@ -1,416 +1,441 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <link rel="icon" href="image/favicon.png" type="image/png">
     <meta charset="UTF-8">
-    <link rel="icon" type="image/png" href="/favicon.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>МойУчитель</title>
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-
-    body {
-        background-color: #f0f2f5;
-        margin: 0;
-        padding: 0;
-    }
-    .header {
-        background: #1a237e;
-        color: white;
-        padding: 16px 24px;
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        border-bottom: 3px solid #0d47a1;
-        margin: 0;
-        border-radius: 0;
-        width: 100vw;
-        position: relative;
-        left: 50%;
-        right: 50%;
-        margin-left: -50vw;
-        margin-right: -50vw;
-    }
-
-    .header-content {
-        max-width: 1400px;
-        width: 100%;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
-
-    .header h1 {
-        font-size: 1.2rem;
-        font-weight: 500;
-        flex: 1;
-        margin: 0;
-    }
-
-    .menu-icon {
-        font-size: 1.5rem;
-        cursor: pointer;
-    }
-
-    .user-icon {
-        width: 40px;
-        height: 40px;
-        background: #5c6bc0;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-    }
-
-    .app {
-        max-width: 1400px;
-        margin: 0 auto;
-        background: white;
-        min-height: 100vh;
-        box-shadow: 0 0 20px rgba(0,0,0,0.05);
-    }
-
-    .content {
-        display: flex;
-        padding: 20px;
-        gap: 24px;
-        flex-direction: row;
-    }
-
-    /* Боковая панель фильтров - справа */
-    .sidebar {
-        width: 280px;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        order: 2;
-    }
-
-    .filter-header {
-        padding: 16px;
-        border-bottom: 1px solid #e0e0e0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #1a237e;
-        font-weight: 500;
-    }
-
-    .filter-header svg {
-        fill: #1a237e;
-    }
-
-    .search-box {
-        padding: 16px;
-        border-bottom: 1px solid #e0e0e0;
-    }
-
-    .search-box input {
-        width: 100%;
-        padding: 10px 12px;
-        border: 1px solid #e0e0e0;
-        border-radius: 6px;
-        font-size: 14px;
-        background: #fafafa;
-    }
-
-    .search-box input:focus {
-        outline: none;
-        border-color: #1a237e;
-        background: white;
-    }
-
-    .filter-section {
-        padding: 16px;
-        border-bottom: 1px solid #e0e0e0;
-    }
-
-    .filter-title {
-        font-weight: 500;
-        color: #333;
-        margin-bottom: 12px;
-        font-size: 14px;
-    }
-
-    .subject-list {
-        max-height: 400px;
-        overflow-y: auto;
-    }
-
-    .subject-item {
-        display: flex;
-        align-items: center;
-        padding: 6px 0;
-        font-size: 14px;
-        color: #444;
-        cursor: pointer;
-    }
-
-    .subject-item:hover {
-        background: #f5f5f5;
-    }
-
-    .subject-item input[type="checkbox"] {
-        margin-right: 10px;
-        width: 16px;
-        height: 16px;
-        cursor: pointer;
-    }
-
-    .subject-count {
-        margin-left: auto;
-        color: #888;
-        font-size: 13px;
-    }
-
-    .filter-actions {
-        padding: 16px;
-        display: flex;
-        gap: 8px;
-    }
-
-    .btn {
-        padding: 8px 16px;
-        border: none;
-        border-radius: 4px;
-        font-size: 13px;
-        cursor: pointer;
-        font-weight: 500;
-    }
-
-    .btn-primary {
-        background: #1a237e;
-        color: white;
-        flex: 1;
-    }
-
-    .btn-primary:hover {
-        background: #0d1b5e;
-    }
-
-    .btn-outline {
-        background: white;
-        border: 1px solid #1a237e;
-        color: #1a237e;
-    }
-
-    .btn-outline:hover {
-        background: #e8eaf6;
-    }
-
-    .stats {
-        padding: 16px;
-        background: #fafafa;
-        border-top: 1px solid #e0e0e0;
-        font-size: 13px;
-        color: #666;
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .stats span span {
-        font-weight: 600;
-        color: #1a237e;
-    }
-
-    /* Основная таблица - слева */
-    .main-panel {
-        flex: 1;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        overflow: hidden;
-        order: 1;
-    }
-
-    .table-header {
-        padding: 16px;
-        background: #fafafa;
-        border-bottom: 1px solid #e0e0e0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .table-header h2 {
-        font-size: 16px;
-        font-weight: 500;
-        color: #1a237e;
-    }
-
-    .refresh-btn {
-        background: none;
-        border: 1px solid #1a237e;
-        color: #1a237e;
-        padding: 6px 12px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 13px;
-    }
-
-    .refresh-btn:hover {
-        background: #e8eaf6;
-    }
-
-    /* Контейнер таблицы с прокруткой */
-    .table-container {
-        overflow-x: auto;
-        margin: 0 -1px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-        table-layout: auto;
-    }
-
-    th {
-        background: #f5f5f5;
-        padding: 8px 6px;
-        text-align: left;
-        font-weight: 500;
-        color: #333;
-        border-bottom: 2px solid #e0e0e0;
-        white-space: nowrap;
-    }
-
-    td {
-        padding: 8px 6px;
-        border-bottom: 1px solid #e0e0e0;
-        color: #444;
-        white-space: nowrap;
-    }
-
-    tr:hover td {
-        background: #fafafa;
-    }
-
-    /* Фиксированная ширина колонок */
-    th:nth-child(1), td:nth-child(1) { width: 40px; }  /* Фото */
-    th:nth-child(2), td:nth-child(2) { max-width: 180px; } /* Имя */
-    th:nth-child(3), td:nth-child(3) { max-width: 100px; } /* Предмет */
-    th:nth-child(4), td:nth-child(4) { width: 60px; }  /* Общая оценка */
-    th:nth-child(5), td:nth-child(5) { width: 60px; }  /* Объективность */
-    th:nth-child(6), td:nth-child(6) { width: 60px; }  /* Отзывчивость */
-    th:nth-child(7), td:nth-child(7) { width: 60px; }  /* Понятность */
-
-    /* Фото учителя - компактное */
-    .teacher-photo {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: #5c6bc0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 11px;
-        margin: 0 auto;
-    }
-
-.teacher-link {
-    color: #1a237e;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 13px;
-    display: inline-block;
-    word-break: break-word;
-    white-space: normal;
-}
-
-    .teacher-link:hover {
-        text-decoration: underline;
-    }
-
-    /* Теги предметов - компактные */
-    .subject-tag {
-        display: inline-block;
-        background: #e8eaf6;
-        color: #1a237e;
-        padding: 2px 6px;
-        border-radius: 10px;
-        font-size: 12px;
-        margin: 1px;
-        font-weight: 500;
-        white-space: nowrap;
-    }
-
-    /* Оценки */
-    .rating {
-        font-weight: 600;
-        font-size: 12px;
-        text-align: center;
-    }
-
-    .rating-high {
-        color: #2e7d32;
-    }
-
-    .rating-medium {
-        color: #ed6c02;
-    }
-
-    .rating-low {
-        color: #d32f2f;
-    }
-
-    .loading {
-        text-align: center;
-        padding: 40px;
-        color: #666;
-    }
-
-    .error {
-        text-align: center;
-        padding: 40px;
-        color: #d32f2f;
-    }
-
-    .no-data {
-        text-align: center;
-        padding: 40px;
-        color: #999;
-    }
-
-    @media (max-width: 1024px) {
-        .content {
-            flex-direction: column;
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Учителя - Школьный портал</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-        .sidebar {
+
+        html, body {
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        body {
+            position: relative;
             width: 100%;
         }
-        /* Отключаем фиксированную ширину на мобильных */
-        th:nth-child(n), td:nth-child(n) {
-            width: auto;
-            max-width: none;
+
+        /* Верхняя плашка на всю ширину экрана */
+        .header {
+            background: #1a237e;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            align-items: auto;
+            gap: 16px;
+            border-bottom: 3px solid #0d47a1;
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            box-sizing: border-box;
         }
-    }
-</style>
+
+        /* Контент внутри плашки центрируем */
+        .header-content {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            flex: 1;
+            margin: 0;
+        }
+
+        .menu-icon {
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .user-icon {
+            width: 40px;
+            height: 40px;
+            background: #5c6bc0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .app {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        .content {
+            display: flex;
+            padding: 20px;
+            gap: 24px;
+            flex-direction: row-reverse;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .filter-header {
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1a237e;
+            font-weight: 500;
+        }
+
+        .filter-header svg {
+            fill: #1a237e;
+        }
+
+        .search-box {
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fafafa;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #1a237e;
+            background: white;
+        }
+
+        .filter-section {
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .filter-title {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .subject-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .subject-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            margin-bottom: 2px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #444;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .subject-item:hover {
+            background: #f5f5f5;
+        }
+
+        .subject-item input[type="checkbox"] {
+            margin-right: 10px;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .subject-item span:first-of-type {
+            flex: 1;
+            cursor: pointer;
+            padding: 4px 0;
+        }
+
+        .subject-count {
+            margin-left: auto;
+            color: #888;
+            font-size: 12px;
+            cursor: default;
+        }
+
+        .filter-actions {
+            padding: 16px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #1a237e;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: #0d1b5e;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid #1a237e;
+            color: #1a237e;
+        }
+
+        .btn-outline:hover {
+            background: #e8eaf6;
+        }
+
+        .stats {
+            padding: 16px;
+            background: #fafafa;
+            border-top: 1px solid #e0e0e0;
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stats span span {
+            font-weight: 600;
+            color: #1a237e;
+        }
+
+        .main-panel {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-header {
+            padding: 16px;
+            background: #fafafa;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .table-header h2 {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1a237e;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: 1px solid #1a237e;
+            color: #1a237e;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .refresh-btn:hover {
+            background: #e8eaf6;
+        }
+
+        .table-container {
+            overflow-y: auto;
+            overflow-x: auto;
+            flex: 1;
+            min-height: 400px;
+            max-height: calc(100vh - 200px);
+        }
+
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f5f5f5;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 500;
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            background: #f5f5f5;
+            z-index: 10;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            color: #444;
+        }
+
+        tr {
+            height: 64px;
+        }
+
+        .teacher-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .teacher-link {
+            color: #1a237e;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-block;
+            word-break: break-word;
+            white-space: normal;
+        }
+
+        .teacher-link:hover {
+            text-decoration: underline;
+        }
+
+        .subject-tag {
+            display: inline-block;
+            background: #e8eaf6;
+            color: #1a237e;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 12px;
+            margin: 2px;
+            font-weight: 500;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .rating {
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .rating-high {
+            color: #2e7d32;
+        }
+
+        .rating-medium {
+            color: #ed6c02;
+        }
+
+        .rating-low {
+            color: #d32f2f;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #d32f2f;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-
     <div class="header">
-    <div class="header-content">
-        <h1>МойУчитель</h1>
-        <div class="user-icon">А</div>
+        <div class="header-content">
+            <h1>МойУчитель</h1>
+        </div>
     </div>
-</div>
 
+    <div class="app">
         <div class="content">
             <div class="sidebar">
-                <div class="filter-header">Фильтры</div>
+                <div class="filter-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/>
+                    </svg>
+                    <span>Фильтры</span>
+                </div>
 
                 <div class="search-box">
-                    <input type="text" id="searchInput" placeholder=" Поиск по имени...">
+                    <input type="text" id="searchInput" placeholder="Поиск по имени учителя...">
                 </div>
 
                 <div class="filter-section">
@@ -434,7 +459,7 @@
             <div class="main-panel">
                 <div class="table-header">
                     <h2>Список учителей</h2>
-                    <button class="refresh-btn" onclick="loadTeachers()">↻ Обновить</button>
+                    <button class="refresh-btn" onclick="loadTeachers()">Обновить</button>
                 </div>
 
                 <div class="table-container">
@@ -448,7 +473,7 @@
                                 <th>Объективность</th>
                                 <th>Отзывчивость</th>
                                 <th>Понятность</th>
-                            </tr>
+                             </tr>
                         </thead>
                         <tbody id="tableBody">
                             <tr>
@@ -462,37 +487,25 @@
     </div>
 
     <script>
+        // Состояние приложения
         let allTeachers = [];
         let filteredTeachers = [];
         let allSubjects = [];
         let selectedSubjects = new Set();
-        let searchTerm = '';
+        let filterTimeout = null;
 
+        // Загрузка данных при открытии страницы
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('Страница загружена, начинаем загрузку учителей...');
             loadTeachers();
         });
 
         async function loadTeachers() {
-            console.log('Загрузка учителей...');
-
             try {
                 const response = await fetch('http://localhost:8000/teachers');
-                console.log('Ответ получен, статус:', response.status);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ошибка! статус: ${response.status}`);
-                }
+                if (!response.ok) throw new Error('Ошибка загрузки');
 
                 const data = await response.json();
-                console.log('Получены данные:', data);
-
-                if (Array.isArray(data)) {
-                    allTeachers = data;
-                } else {
-                    console.error('Неожиданный формат данных:', data);
-                    allTeachers = [];
-                }
+                allTeachers = Array.isArray(data) ? data : [];
 
                 filteredTeachers = [...allTeachers];
                 extractSubjects();
@@ -500,33 +513,25 @@
                 updateStats();
 
             } catch (error) {
-                console.error('Ошибка загрузки:', error);
+                console.error('Ошибка:', error);
                 document.getElementById('tableBody').innerHTML = `
-                    <tr>
-                        <td colspan="7" class="error">
-                            ❌ Ошибка загрузки: ${error.message}<br>
-                            <button class="refresh-btn" onclick="loadTeachers()" style="margin-top: 10px;">Повторить</button>
-                        </td>
-                    </tr>
+                    <tr><td colspan="7" class="error">Ошибка загрузки данных</td></tr>
                 `;
             }
         }
 
+        // Извлечение предметов
         function extractSubjects() {
-            console.log('Извлечение предметов из данных...');
             const subjectsSet = new Set();
-
             allTeachers.forEach(teacher => {
-                if (teacher.subject_name) {
-                    subjectsSet.add(teacher.subject_name);
-                }
+                const subject = teacher.subject_name || teacher.subject;
+                if (subject) subjectsSet.add(subject);
             });
-
             allSubjects = Array.from(subjectsSet).sort();
-            console.log('Найдены предметы:', allSubjects);
             renderSubjectFilters();
         }
 
+        // Отрисовка фильтров предметов
         function renderSubjectFilters() {
             const container = document.getElementById('subjectList');
 
@@ -536,89 +541,108 @@
             }
 
             container.innerHTML = allSubjects.map(subject => {
-                const count = allTeachers.filter(t => t.subject_name === subject).length;
+                const count = allTeachers.filter(t => {
+                    const teacherSubject = t.subject_name || t.subject;
+                    return teacherSubject === subject;
+                }).length;
                 return `
-                    <div class="subject-item" onclick="toggleSubject('${subject}')">
+                    <div class="subject-item">
                         <input type="checkbox"
+                               id="chk_${subject.replace(/\s/g, '_')}"
                                ${selectedSubjects.has(subject) ? 'checked' : ''}
-                               onchange="toggleSubject('${subject}')"
-                               onclick="event.stopPropagation()">
-                        <span>${subject}</span>
+                               onchange="toggleSubject('${subject}')">
+                        <span onclick="toggleSubject('${subject}')">${subject}</span>
                         <span class="subject-count">${count}</span>
                     </div>
                 `;
             }).join('');
         }
 
+        // Переключение предмета
         function toggleSubject(subject) {
             if (selectedSubjects.has(subject)) {
                 selectedSubjects.delete(subject);
             } else {
                 selectedSubjects.add(subject);
             }
-            renderSubjectFilters();
+            const checkbox = document.getElementById(`chk_${subject.replace(/\s/g, '_')}`);
+            if (checkbox) checkbox.checked = selectedSubjects.has(subject);
             applyFilters();
         }
 
+        // Применение фильтров
         function applyFilters() {
-            searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (filterTimeout) clearTimeout(filterTimeout);
 
-            filteredTeachers = allTeachers.filter(teacher => {
-                const nameMatch = teacher.name.toLowerCase().includes(searchTerm);
-                let subjectMatch = true;
-                if (selectedSubjects.size > 0) {
-                    subjectMatch = selectedSubjects.has(teacher.subject_name);
+            filterTimeout = setTimeout(() => {
+                const currentSearchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+                const newFiltered = allTeachers.filter(teacher => {
+                    const nameMatch = teacher.name.toLowerCase().includes(currentSearchTerm);
+                    let subjectMatch = true;
+                    if (selectedSubjects.size > 0) {
+                        const teacherSubject = teacher.subject_name || teacher.subject || '';
+                        subjectMatch = selectedSubjects.has(teacherSubject);
+                    }
+                    return nameMatch && subjectMatch;
+                });
+
+                if (JSON.stringify(filteredTeachers.map(t => t.id)) !== JSON.stringify(newFiltered.map(t => t.id))) {
+                    filteredTeachers = newFiltered;
+                    renderTable();
+                    updateStats();
                 }
-
-                return nameMatch && subjectMatch;
-            });
-
-            renderTable();
-            updateStats();
+            }, 50);
         }
 
-        function resetFilters() {
-            selectedSubjects.clear();
-            searchTerm = '';
-            document.getElementById('searchInput').value = '';
-            renderSubjectFilters();
-            filteredTeachers = [...allTeachers];
-            renderTable();
-            updateStats();
-        }
-
+        // Отрисовка таблицы
         function renderTable() {
             const tbody = document.getElementById('tableBody');
+            const scrollContainer = document.querySelector('.table-container');
+            const scrollPos = scrollContainer.scrollTop;
 
             if (filteredTeachers.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7" class="no-data">Нет данных</td></tr>';
+                scrollContainer.scrollTop = scrollPos;
                 return;
             }
 
-            tbody.innerHTML = filteredTeachers.map(teacher => {
+            let html = '';
+            for (const teacher of filteredTeachers) {
                 let avgClarity = 0, avgFairness = 0, avgAttitude = 0, avgOverall = 0;
 
                 if (teacher.reviews && teacher.reviews.length > 0) {
                     const reviews = teacher.reviews;
-                    avgClarity = reviews.reduce((sum, r) => sum + r.clarity_rating, 0) / reviews.length;
-                    avgFairness = reviews.reduce((sum, r) => sum + r.fairness_rating, 0) / reviews.length;
-                    avgAttitude = reviews.reduce((sum, r) => sum + r.attitude_rating, 0) / reviews.length;
+                    avgClarity = reviews.reduce((sum, r) => sum + (r.clarity_rating || 0), 0) / reviews.length;
+                    avgFairness = reviews.reduce((sum, r) => sum + (r.fairness_rating || 0), 0) / reviews.length;
+                    avgAttitude = reviews.reduce((sum, r) => sum + (r.attitude_rating || 0), 0) / reviews.length;
                     avgOverall = (avgClarity + avgFairness + avgAttitude) / 3;
                 }
-                const initials = teacher.name.split(' ').map(n => n[0]).join('').substring(0, 2);
 
-                return `
+                const nameParts = teacher.name.split(' ');
+                let initials = '';
+                if (nameParts.length >= 2) {
+                    initials = (nameParts[0][0] + nameParts[1][0]).toUpperCase();
+                } else if (nameParts.length === 1) {
+                    initials = nameParts[0].substring(0, 2).toUpperCase();
+                }
+                const subject = teacher.subject_name || teacher.subject || '—';
+
+                html += `
                     <tr>
                         <td><div class="teacher-photo">${initials}</div></td>
                         <td><a href="teacher.html?id=${teacher.id}" class="teacher-link">${teacher.name}</a></td>
-                        <td><span class="subject-tag">${teacher.subject_name || '—'}</span></td>
+                        <td><span class="subject-tag">${subject}</span></td>
                         <td class="rating ${getRatingClass(avgOverall)}">${avgOverall.toFixed(2)}</td>
                         <td class="rating ${getRatingClass(avgFairness)}">${avgFairness.toFixed(1)}</td>
                         <td class="rating ${getRatingClass(avgAttitude)}">${avgAttitude.toFixed(1)}</td>
                         <td class="rating ${getRatingClass(avgClarity)}">${avgClarity.toFixed(1)}</td>
                     </tr>
                 `;
-            }).join('');
+            }
+
+            tbody.innerHTML = html;
+            scrollContainer.scrollTop = scrollPos;
         }
 
         function getRatingClass(rating) {
@@ -631,8 +655,16 @@
             document.getElementById('totalCount').textContent = allTeachers.length;
             document.getElementById('displayedCount').textContent = filteredTeachers.length;
         }
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            searchTerm = e.target.value;
+
+        function resetFilters() {
+            selectedSubjects.clear();
+            document.getElementById('searchInput').value = '';
+            renderSubjectFilters();
+            applyFilters();
+        }
+
+        // Поиск с задержкой
+        document.getElementById('searchInput').addEventListener('input', () => {
             applyFilters();
         });
     </script>
