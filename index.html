@@ -18,21 +18,17 @@ app.add_middleware(
 
 # ==================== РАБОТА С БАЗОЙ ДАННЫХ ====================
 
-# Путь к базе данных
 DB_PATH = "teachers.db"
 
 def get_db():
-    """Получить соединение с базой данных"""
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
-    """Инициализация базы данных (создание таблиц)"""
     conn = get_db()
     cursor = conn.cursor()
     
-    # Таблица предметов
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS subjects (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,7 +36,6 @@ def init_db():
         )
     ''')
     
-    # Таблица учителей
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS teachers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,7 +48,6 @@ def init_db():
         )
     ''')
     
-    # Таблица отзывов
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS reviews (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -72,19 +66,16 @@ def init_db():
     conn.close()
     print("✅ База данных инициализирована")
 
-# Инициализируем базу при запуске
 init_db()
 
 # ==================== ЭНДПОИНТЫ ====================
 
 @app.get("/health")
 def health():
-    """Проверка работоспособности сервера"""
     return {"status": "healthy", "database": "sqlite"}
 
 @app.get("/")
 def root():
-    """Главная страница"""
     try:
         with open("index.html", "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
@@ -95,7 +86,6 @@ def root():
 
 @app.get("/subjects")
 def get_subjects():
-    """Получить все предметы"""
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute("SELECT id, name FROM subjects ORDER BY id")
@@ -105,7 +95,6 @@ def get_subjects():
 
 @app.post("/subjects")
 def create_subject(name: str):
-    """Создать новый предмет"""
     conn = get_db()
     cursor = conn.cursor()
     try:
@@ -122,7 +111,6 @@ def create_subject(name: str):
 
 @app.get("/teachers")
 def get_teachers():
-    """Получить всех учителей с их предметами и отзывами"""
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute('''
@@ -133,7 +121,6 @@ def get_teachers():
     ''')
     teachers = [dict(row) for row in cursor.fetchall()]
     
-    # Добавляем отзывы для каждого учителя
     for teacher in teachers:
         cursor.execute("SELECT * FROM reviews WHERE teacher_id = ? ORDER BY id DESC", (teacher["id"],))
         teacher["reviews"] = [dict(row) for row in cursor.fetchall()]
@@ -143,7 +130,6 @@ def get_teachers():
 
 @app.get("/teachers/{teacher_id}")
 def get_teacher(teacher_id: int):
-    """Получить учителя по ID"""
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute('''
@@ -173,11 +159,9 @@ def create_teacher(
     experience: int = None,
     education: str = None
 ):
-    """Создать нового учителя"""
     conn = get_db()
     cursor = conn.cursor()
     
-    # Проверяем существование предмета
     cursor.execute("SELECT id FROM subjects WHERE id = ?", (subject_id,))
     if not cursor.fetchone():
         conn.close()
@@ -202,7 +186,6 @@ def update_teacher(
     experience: int = None,
     education: str = None
 ):
-    """Обновить данные учителя"""
     conn = get_db()
     cursor = conn.cursor()
     
@@ -228,7 +211,6 @@ def update_teacher(
 
 @app.delete("/teachers/{teacher_id}")
 def delete_teacher(teacher_id: int):
-    """Удалить учителя"""
     conn = get_db()
     cursor = conn.cursor()
     
@@ -248,7 +230,6 @@ def delete_teacher(teacher_id: int):
 
 @app.get("/teachers/{teacher_id}/reviews")
 def get_teacher_reviews(teacher_id: int):
-    """Получить все отзывы учителя"""
     conn = get_db()
     cursor = conn.cursor()
     
@@ -273,7 +254,6 @@ def create_review(
     attitude_rating: int,
     comment: str
 ):
-    """Создать новый отзыв"""
     if not all(1 <= r <= 5 for r in [clarity_rating, fairness_rating, attitude_rating]):
         raise HTTPException(status_code=400, detail="Оценки должны быть от 1 до 5")
     
@@ -297,7 +277,6 @@ def create_review(
 
 @app.delete("/reviews/{review_id}")
 def delete_review(review_id: int):
-    """Удалить отзыв"""
     conn = get_db()
     cursor = conn.cursor()
     
@@ -317,7 +296,6 @@ def delete_review(review_id: int):
 
 @app.get("/search/teachers")
 def search_teachers(q: str):
-    """Поиск учителей по имени"""
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute('''
@@ -333,7 +311,6 @@ def search_teachers(q: str):
 
 # ==================== СТАТИЧЕСКИЕ ФАЙЛЫ ====================
 
-# Раздача статических файлов (HTML, CSS, JS)
 app.mount("/", StaticFiles(directory=".", html=True), name="static")
 
 # ==================== ЗАПУСК ====================
@@ -342,7 +319,6 @@ if __name__ == "__main__":
     import uvicorn
     import os
     
-    # Получаем порт из переменной окружения Render или используем 8000
     port = int(os.getenv("PORT", 8000))
     
     print("\n" + "="*50)
