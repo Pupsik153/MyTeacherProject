@@ -1,336 +1,672 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, RedirectResponse
-import sqlite3
-import os
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Учителя - Школьный портал</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
 
-app = FastAPI(title="Teachers Reviews API", version="1.0.0")
+        html, body {
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
 
-# CORS - разрешаем запросы с любых источников
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+        body {
+            position: relative;
+            width: 100%;
+        }
 
-# ==================== РАБОТА С БАЗОЙ ДАННЫХ ====================
+        /* Верхняя плашка на всю ширину экрана */
+        .header {
+            background: #1a237e;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            align-items: auto;
+            gap: 16px;
+            border-bottom: 3px solid #0d47a1;
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            box-sizing: border-box;
+        }
 
-DB_PATH = "teachers.db"
+        /* Контент внутри плашки центрируем */
+        .header-content {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
 
-def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            flex: 1;
+            margin: 0;
+        }
 
-def init_db():
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS subjects (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE
-        )
-    ''')
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS teachers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            subject_id INTEGER NOT NULL,
-            photo_url TEXT,
-            experience INTEGER,
-            education TEXT,
-            FOREIGN KEY (subject_id) REFERENCES subjects(id)
-        )
-    ''')
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS reviews (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            teacher_id INTEGER NOT NULL,
-            author_name TEXT NOT NULL,
-            clarity_rating INTEGER NOT NULL,
-            fairness_rating INTEGER NOT NULL,
-            attitude_rating INTEGER NOT NULL,
-            comment TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE
-        )
-    ''')
-    
-    conn.commit()
-    conn.close()
-    print("✅ База данных инициализирована")
+        .menu-icon {
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
 
-init_db()
+        .user-icon {
+            width: 40px;
+            height: 40px;
+            background: #5c6bc0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
 
-# ==================== ЭНДПОИНТЫ ====================
+        .app {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
 
-@app.get("/health")
-def health():
-    return {"status": "healthy", "database": "sqlite"}
+        .content {
+            display: flex;
+            padding: 20px;
+            gap: 24px;
+            flex-direction: row-reverse;
+        }
 
-# ГЛАВНАЯ СТРАНИЦА - перенаправляем на index.html
-@app.get("/")
-def root():
-    try:
-        with open("index.html", "r", encoding="utf-8") as f:
-            return HTMLResponse(content=f.read())
-    except FileNotFoundError:
-        return HTMLResponse(content="<h1>index.html не найден</h1>", status_code=404)
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
 
-# ==================== ПРЕДМЕТЫ ====================
+        .filter-header {
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1a237e;
+            font-weight: 500;
+        }
 
-@app.get("/subjects")
-def get_subjects():
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, name FROM subjects ORDER BY id")
-    subjects = [dict(row) for row in cursor.fetchall()]
-    conn.close()
-    return subjects
+        .filter-header svg {
+            fill: #1a237e;
+        }
 
-@app.post("/subjects")
-def create_subject(name: str):
-    conn = get_db()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("INSERT INTO subjects (name) VALUES (?)", (name,))
-        conn.commit()
-        subject_id = cursor.lastrowid
-    except sqlite3.IntegrityError:
-        conn.close()
-        raise HTTPException(status_code=400, detail="Предмет уже существует")
-    conn.close()
-    return {"id": subject_id, "name": name}
+        .search-box {
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
 
-# ==================== УЧИТЕЛЯ ====================
+        .search-box input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fafafa;
+        }
 
-@app.get("/teachers")
-def get_teachers():
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute('''
-        SELECT t.*, s.name as subject_name 
-        FROM teachers t 
-        LEFT JOIN subjects s ON t.subject_id = s.id
-        ORDER BY t.id
-    ''')
-    teachers = [dict(row) for row in cursor.fetchall()]
-    
-    for teacher in teachers:
-        cursor.execute("SELECT * FROM reviews WHERE teacher_id = ? ORDER BY id DESC", (teacher["id"],))
-        teacher["reviews"] = [dict(row) for row in cursor.fetchall()]
-    
-    conn.close()
-    return teachers
+        .search-box input:focus {
+            outline: none;
+            border-color: #1a237e;
+            background: white;
+        }
 
-@app.get("/teachers/{teacher_id}")
-def get_teacher(teacher_id: int):
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute('''
-        SELECT t.*, s.name as subject_name 
-        FROM teachers t 
-        LEFT JOIN subjects s ON t.subject_id = s.id 
-        WHERE t.id = ?
-    ''', (teacher_id,))
-    teacher = cursor.fetchone()
-    
-    if not teacher:
-        conn.close()
-        raise HTTPException(status_code=404, detail="Учитель не найден")
-    
-    result = dict(teacher)
-    cursor.execute("SELECT * FROM reviews WHERE teacher_id = ? ORDER BY id DESC", (teacher_id,))
-    result["reviews"] = [dict(row) for row in cursor.fetchall()]
-    
-    conn.close()
-    return result
+        .filter-section {
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
 
-@app.post("/teachers")
-def create_teacher(
-    name: str,
-    subject_id: int,
-    photo_url: str = None,
-    experience: int = None,
-    education: str = None
-):
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT id FROM subjects WHERE id = ?", (subject_id,))
-    if not cursor.fetchone():
-        conn.close()
-        raise HTTPException(status_code=404, detail="Предмет не найден")
-    
-    cursor.execute('''
-        INSERT INTO teachers (name, subject_id, photo_url, experience, education)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (name, subject_id, photo_url, experience, education))
-    conn.commit()
-    teacher_id = cursor.lastrowid
-    conn.close()
-    
-    return {"id": teacher_id, "name": name, "subject_id": subject_id}
+        .filter-title {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
 
-@app.put("/teachers/{teacher_id}")
-def update_teacher(
-    teacher_id: int,
-    name: str,
-    subject_id: int,
-    photo_url: str = None,
-    experience: int = None,
-    education: str = None
-):
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT id FROM teachers WHERE id = ?", (teacher_id,))
-    if not cursor.fetchone():
-        conn.close()
-        raise HTTPException(status_code=404, detail="Учитель не найден")
-    
-    cursor.execute("SELECT id FROM subjects WHERE id = ?", (subject_id,))
-    if not cursor.fetchone():
-        conn.close()
-        raise HTTPException(status_code=404, detail="Предмет не найден")
-    
-    cursor.execute('''
-        UPDATE teachers 
-        SET name = ?, subject_id = ?, photo_url = ?, experience = ?, education = ?
-        WHERE id = ?
-    ''', (name, subject_id, photo_url, experience, education, teacher_id))
-    conn.commit()
-    conn.close()
-    
-    return {"id": teacher_id, "name": name, "subject_id": subject_id}
+        .subject-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
 
-@app.delete("/teachers/{teacher_id}")
-def delete_teacher(teacher_id: int):
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT name FROM teachers WHERE id = ?", (teacher_id,))
-    teacher = cursor.fetchone()
-    if not teacher:
-        conn.close()
-        raise HTTPException(status_code=404, detail="Учитель не найден")
-    
-    cursor.execute("DELETE FROM teachers WHERE id = ?", (teacher_id,))
-    conn.commit()
-    conn.close()
-    
-    return {"message": f"Учитель '{teacher['name']}' удален"}
+        .subject-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            margin-bottom: 2px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #444;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
 
-# ==================== ОТЗЫВЫ ====================
+        .subject-item:hover {
+            background: #f5f5f5;
+        }
 
-@app.get("/teachers/{teacher_id}/reviews")
-def get_teacher_reviews(teacher_id: int):
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT id FROM teachers WHERE id = ?", (teacher_id,))
-    if not cursor.fetchone():
-        conn.close()
-        raise HTTPException(status_code=404, detail="Учитель не найден")
-    
-    cursor.execute('''
-        SELECT * FROM reviews WHERE teacher_id = ? ORDER BY id DESC
-    ''', (teacher_id,))
-    reviews = [dict(row) for row in cursor.fetchall()]
-    conn.close()
-    return reviews
+        .subject-item input[type="checkbox"] {
+            margin-right: 10px;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
 
-@app.post("/reviews")
-def create_review(
-    teacher_id: int,
-    author_name: str,
-    clarity_rating: int,
-    fairness_rating: int,
-    attitude_rating: int,
-    comment: str
-):
-    if not all(1 <= r <= 5 for r in [clarity_rating, fairness_rating, attitude_rating]):
-        raise HTTPException(status_code=400, detail="Оценки должны быть от 1 до 5")
-    
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT id FROM teachers WHERE id = ?", (teacher_id,))
-    if not cursor.fetchone():
-        conn.close()
-        raise HTTPException(status_code=404, detail="Учитель не найден")
-    
-    cursor.execute('''
-        INSERT INTO reviews (teacher_id, author_name, clarity_rating, fairness_rating, attitude_rating, comment)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ''', (teacher_id, author_name, clarity_rating, fairness_rating, attitude_rating, comment))
-    conn.commit()
-    review_id = cursor.lastrowid
-    conn.close()
-    
-    return {"id": review_id, "teacher_id": teacher_id}
+        .subject-item span:first-of-type {
+            flex: 1;
+            cursor: pointer;
+            padding: 4px 0;
+        }
 
-@app.delete("/reviews/{review_id}")
-def delete_review(review_id: int):
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT author_name FROM reviews WHERE id = ?", (review_id,))
-    review = cursor.fetchone()
-    if not review:
-        conn.close()
-        raise HTTPException(status_code=404, detail="Отзыв не найден")
-    
-    cursor.execute("DELETE FROM reviews WHERE id = ?", (review_id,))
-    conn.commit()
-    conn.close()
-    
-    return {"message": f"Отзыв от {review['author_name']} удален"}
+        .subject-count {
+            margin-left: auto;
+            color: #888;
+            font-size: 12px;
+            cursor: default;
+        }
 
-# ==================== ПОИСК ====================
+        .filter-actions {
+            padding: 16px;
+            display: flex;
+            gap: 8px;
+        }
 
-@app.get("/search/teachers")
-def search_teachers(q: str):
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute('''
-        SELECT t.*, s.name as subject_name 
-        FROM teachers t 
-        LEFT JOIN subjects s ON t.subject_id = s.id 
-        WHERE t.name LIKE ?
-        ORDER BY t.id
-    ''', (f"%{q}%",))
-    teachers = [dict(row) for row in cursor.fetchall()]
-    conn.close()
-    return teachers
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+        }
 
-# ==================== СТАТИЧЕСКИЕ ФАЙЛЫ ====================
+        .btn-primary {
+            background: #1a237e;
+            color: white;
+            flex: 1;
+        }
 
-# Раздаём все файлы из текущей папки, кроме тех, у которых есть свои эндпоинты
-# Это позволяет index.html открываться без перенаправления
-app.mount("/static", StaticFiles(directory=".", html=True), name="static")
+        .btn-primary:hover {
+            background: #0d1b5e;
+        }
 
-# ==================== ЗАПУСК ====================
+        .btn-outline {
+            background: white;
+            border: 1px solid #1a237e;
+            color: #1a237e;
+        }
 
-if __name__ == "__main__":
-    import uvicorn
-    import os
-    
-    port = int(os.getenv("PORT", 8000))
-    
-    print("\n" + "="*50)
-    print("🚀 ЗАПУСК СЕРВЕРА")
-    print("="*50)
-    print(f"📁 База данных: {DB_PATH}")
-    print(f"📝 Документация: http://localhost:{port}/docs")
-    print(f"🔍 Health check: http://localhost:{port}/health")
-    print(f"🌐 Главная страница: http://localhost:{port}/")
-    print("="*50 + "\n")
-    
-    uvicorn.run(app, host="0.0.0.0", port=port)
+        .btn-outline:hover {
+            background: #e8eaf6;
+        }
+
+        .stats {
+            padding: 16px;
+            background: #fafafa;
+            border-top: 1px solid #e0e0e0;
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stats span span {
+            font-weight: 600;
+            color: #1a237e;
+        }
+
+        .main-panel {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-header {
+            padding: 16px;
+            background: #fafafa;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .table-header h2 {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1a237e;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: 1px solid #1a237e;
+            color: #1a237e;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .refresh-btn:hover {
+            background: #e8eaf6;
+        }
+
+        .table-container {
+            overflow-y: auto;
+            overflow-x: auto;
+            flex: 1;
+            min-height: 400px;
+            max-height: calc(100vh - 200px);
+        }
+
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f5f5f5;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 500;
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            background: #f5f5f5;
+            z-index: 10;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            color: #444;
+        }
+
+        tr {
+            height: 64px;
+        }
+
+        .teacher-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .teacher-link {
+            color: #1a237e;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-block;
+            word-break: break-word;
+            white-space: normal;
+        }
+
+        .teacher-link:hover {
+            text-decoration: underline;
+        }
+
+        .subject-tag {
+            display: inline-block;
+            background: #e8eaf6;
+            color: #1a237e;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 12px;
+            margin: 2px;
+            font-weight: 500;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .rating {
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .rating-high {
+            color: #2e7d32;
+        }
+
+        .rating-medium {
+            color: #ed6c02;
+        }
+
+        .rating-low {
+            color: #d32f2f;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #d32f2f;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>МойУчитель</h1>
+        </div>
+    </div>
+
+    <div class="app">
+        <div class="content">
+            <div class="sidebar">
+                <div class="filter-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/>
+                    </svg>
+                    <span>Фильтры</span>
+                </div>
+
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Поиск по имени учителя...">
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">Предметы</div>
+                    <div class="subject-list" id="subjectList">
+                        <div class="loading">Загрузка предметов...</div>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn btn-primary" onclick="applyFilters()">Применить</button>
+                    <button class="btn btn-outline" onclick="resetFilters()">Сбросить</button>
+                </div>
+
+                <div class="stats" id="stats">
+                    <span>Всего: <span id="totalCount">0</span></span>
+                    <span>Показано: <span id="displayedCount">0</span></span>
+                </div>
+            </div>
+
+            <div class="main-panel">
+                <div class="table-header">
+                    <h2>Список учителей</h2>
+                    <button class="refresh-btn" onclick="loadTeachers()">Обновить</button>
+                </div>
+
+                <div class="table-container">
+                    <table id="teachersTable">
+                        <thead>
+                            <tr>
+                                <th>Фото</th>
+                                <th>Имя учителя</th>
+                                <th>Предмет</th>
+                                <th>Общая оценка</th>
+                                <th>Объективность</th>
+                                <th>Отзывчивость</th>
+                                <th>Понятность</th>
+                             </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr>
+                                <td colspan="7" class="loading">Загрузка данных...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Состояние приложения
+        let allTeachers = [];
+        let filteredTeachers = [];
+        let allSubjects = [];
+        let selectedSubjects = new Set();
+        let filterTimeout = null;
+
+        // Загрузка данных при открытии страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTeachers();
+        });
+
+        async function loadTeachers() {
+            try {
+                const response = await fetch('http://localhost:8000/teachers');
+                if (!response.ok) throw new Error('Ошибка загрузки');
+
+                const data = await response.json();
+                allTeachers = Array.isArray(data) ? data : [];
+
+                filteredTeachers = [...allTeachers];
+                extractSubjects();
+                renderTable();
+                updateStats();
+
+            } catch (error) {
+                console.error('Ошибка:', error);
+                document.getElementById('tableBody').innerHTML = `
+                    <tr><td colspan="7" class="error">Ошибка загрузки данных</td></tr>
+                `;
+            }
+        }
+
+        // Извлечение предметов
+        function extractSubjects() {
+            const subjectsSet = new Set();
+            allTeachers.forEach(teacher => {
+                const subject = teacher.subject_name || teacher.subject;
+                if (subject) subjectsSet.add(subject);
+            });
+            allSubjects = Array.from(subjectsSet).sort();
+            renderSubjectFilters();
+        }
+
+        // Отрисовка фильтров предметов
+        function renderSubjectFilters() {
+            const container = document.getElementById('subjectList');
+
+            if (allSubjects.length === 0) {
+                container.innerHTML = '<div class="no-data">Нет предметов</div>';
+                return;
+            }
+
+            container.innerHTML = allSubjects.map(subject => {
+                const count = allTeachers.filter(t => {
+                    const teacherSubject = t.subject_name || t.subject;
+                    return teacherSubject === subject;
+                }).length;
+                return `
+                    <div class="subject-item">
+                        <input type="checkbox"
+                               id="chk_${subject.replace(/\s/g, '_')}"
+                               ${selectedSubjects.has(subject) ? 'checked' : ''}
+                               onchange="toggleSubject('${subject}')">
+                        <span onclick="toggleSubject('${subject}')">${subject}</span>
+                        <span class="subject-count">${count}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Переключение предмета
+        function toggleSubject(subject) {
+            if (selectedSubjects.has(subject)) {
+                selectedSubjects.delete(subject);
+            } else {
+                selectedSubjects.add(subject);
+            }
+            const checkbox = document.getElementById(`chk_${subject.replace(/\s/g, '_')}`);
+            if (checkbox) checkbox.checked = selectedSubjects.has(subject);
+            applyFilters();
+        }
+
+        // Применение фильтров
+        function applyFilters() {
+            if (filterTimeout) clearTimeout(filterTimeout);
+
+            filterTimeout = setTimeout(() => {
+                const currentSearchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+                const newFiltered = allTeachers.filter(teacher => {
+                    const nameMatch = teacher.name.toLowerCase().includes(currentSearchTerm);
+                    let subjectMatch = true;
+                    if (selectedSubjects.size > 0) {
+                        const teacherSubject = teacher.subject_name || teacher.subject || '';
+                        subjectMatch = selectedSubjects.has(teacherSubject);
+                    }
+                    return nameMatch && subjectMatch;
+                });
+
+                if (JSON.stringify(filteredTeachers.map(t => t.id)) !== JSON.stringify(newFiltered.map(t => t.id))) {
+                    filteredTeachers = newFiltered;
+                    renderTable();
+                    updateStats();
+                }
+            }, 50);
+        }
+
+        // Отрисовка таблицы
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const scrollContainer = document.querySelector('.table-container');
+            const scrollPos = scrollContainer.scrollTop;
+
+            if (filteredTeachers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="no-data">Нет данных</td></tr>';
+                scrollContainer.scrollTop = scrollPos;
+                return;
+            }
+
+            let html = '';
+            for (const teacher of filteredTeachers) {
+                let avgClarity = 0, avgFairness = 0, avgAttitude = 0, avgOverall = 0;
+
+                if (teacher.reviews && teacher.reviews.length > 0) {
+                    const reviews = teacher.reviews;
+                    avgClarity = reviews.reduce((sum, r) => sum + (r.clarity_rating || 0), 0) / reviews.length;
+                    avgFairness = reviews.reduce((sum, r) => sum + (r.fairness_rating || 0), 0) / reviews.length;
+                    avgAttitude = reviews.reduce((sum, r) => sum + (r.attitude_rating || 0), 0) / reviews.length;
+                    avgOverall = (avgClarity + avgFairness + avgAttitude) / 3;
+                }
+
+                const nameParts = teacher.name.split(' ');
+                let initials = '';
+                if (nameParts.length >= 2) {
+                    initials = (nameParts[0][0] + nameParts[1][0]).toUpperCase();
+                } else if (nameParts.length === 1) {
+                    initials = nameParts[0].substring(0, 2).toUpperCase();
+                }
+                const subject = teacher.subject_name || teacher.subject || '—';
+
+                html += `
+                    <tr>
+                        <td><div class="teacher-photo">${initials}</div></td>
+                        <td><a href="teacher.html?id=${teacher.id}" class="teacher-link">${teacher.name}</a></td>
+                        <td><span class="subject-tag">${subject}</span></td>
+                        <td class="rating ${getRatingClass(avgOverall)}">${avgOverall.toFixed(2)}</td>
+                        <td class="rating ${getRatingClass(avgFairness)}">${avgFairness.toFixed(1)}</td>
+                        <td class="rating ${getRatingClass(avgAttitude)}">${avgAttitude.toFixed(1)}</td>
+                        <td class="rating ${getRatingClass(avgClarity)}">${avgClarity.toFixed(1)}</td>
+                    </tr>
+                `;
+            }
+
+            tbody.innerHTML = html;
+            scrollContainer.scrollTop = scrollPos;
+        }
+
+        function getRatingClass(rating) {
+            if (rating >= 4.5) return 'rating-high';
+            if (rating >= 3.5) return 'rating-medium';
+            return 'rating-low';
+        }
+
+        function updateStats() {
+            document.getElementById('totalCount').textContent = allTeachers.length;
+            document.getElementById('displayedCount').textContent = filteredTeachers.length;
+        }
+
+        function resetFilters() {
+            selectedSubjects.clear();
+            document.getElementById('searchInput').value = '';
+            renderSubjectFilters();
+            applyFilters();
+        }
+
+        // Поиск с задержкой
+        document.getElementById('searchInput').addEventListener('input', () => {
+            applyFilters();
+        });
+    </script>
+</body>
+</html>
